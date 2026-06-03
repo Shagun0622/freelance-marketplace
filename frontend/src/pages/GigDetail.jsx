@@ -39,12 +39,39 @@ function GigDetail() {
         setLoading(false);
     };
 
-    const handleProposalChange = (e) => setProposal({ ...proposal, [e.target.name]: e.target.value });
+    const handleProposalChange = (e) => {
+        const { name, value } = e.target;
+        
+        // For bidAmount, validate against max budget
+        if (name === 'bidAmount') {
+            const bidValue = parseInt(value);
+            if (gig && bidValue > gig.budget?.max) {
+                setError(`Bid amount cannot exceed ₹${gig.budget?.max}`);
+            } else {
+                setError('');
+            }
+        }
+        
+        setProposal({ ...proposal, [name]: value });
+    };
 
     const handleSubmitProposal = async (e) => {
         e.preventDefault();
+        
+        // Final validation before submission
+        if (parseInt(proposal.bidAmount) > gig.budget?.max) {
+            setError(`Bid amount cannot exceed ₹${gig.budget?.max}`);
+            return;
+        }
+        
+        if (parseInt(proposal.bidAmount) < 50) {
+            setError('Bid amount must be at least ₹50');
+            return;
+        }
+        
         setSubmitting(true);
         setError('');
+        
         try {
             await axios.post('http://localhost:5000/api/proposals',
                 { gigId: id, coverLetter: proposal.coverLetter, bidAmount: parseInt(proposal.bidAmount), estimatedDays: parseInt(proposal.estimatedDays) },
@@ -241,7 +268,7 @@ function GigDetail() {
                                         className={`${inputClass} resize-none`} required />
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {/* ── Bid Amount with INR conversion ── */}
+                                    {/* Bid Amount with validation */}
                                     <div>
                                         <label className={labelClass}>Bid Amount (INR) <span className="text-red-400">*</span></label>
                                         <div className="relative">
@@ -251,9 +278,10 @@ function GigDetail() {
                                                 name="bidAmount"
                                                 value={proposal.bidAmount}
                                                 onChange={handleProposalChange}
-                                                placeholder="41,750"
+                                                placeholder={`Max: ₹${gig.budget?.max}`}
                                                 className={`${inputClass} pl-7`}
                                                 required
+                                                max={gig.budget?.max}
                                             />
                                         </div>
                                         {bidInINR && (
@@ -262,6 +290,11 @@ function GigDetail() {
                                         <p className="text-xs text-gray-400 mt-0.5">
                                             Budget: {formatAmount(gig.budget?.min)} – {formatAmount(gig.budget?.max)}
                                         </p>
+                                        {proposal.bidAmount && parseInt(proposal.bidAmount) > gig.budget?.max && (
+                                            <p className="text-xs text-red-500 mt-1">
+                                                ⚠️ Bid cannot exceed ₹{gig.budget?.max}
+                                            </p>
+                                        )}
                                     </div>
                                     <div>
                                         <label className={labelClass}>Estimated Days <span className="text-red-400">*</span></label>
@@ -272,7 +305,7 @@ function GigDetail() {
                                         </div>
                                     </div>
                                 </div>
-                                <button type="submit" disabled={submitting}
+                                <button type="submit" disabled={submitting || (proposal.bidAmount && parseInt(proposal.bidAmount) > gig.budget?.max)}
                                     className="w-full bg-[#0d9f6f] text-white py-3 rounded-xl font-semibold text-sm hover:bg-[#0a8560] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
                                     {submitting ? <><Loader size={15} className="animate-spin" /> Submitting...</> : <><Send size={15} /> Submit Proposal</>}
                                 </button>
