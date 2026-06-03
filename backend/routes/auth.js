@@ -159,13 +159,13 @@ router.post('/login', async (req, res) => {
         user.lockUntil = undefined;
         await user.save();
 
-        if (!user.isEmailVerified) {
-            return res.status(403).json({
-                message: 'Please verify your email before logging in',
-                requiresVerification: true,
-                email: user.email
-            });
-        }
+        // if (!user.isEmailVerified) {
+        //     return res.status(403).json({
+        //         message: 'Please verify your email before logging in',
+        //         requiresVerification: true,
+        //         email: user.email
+        //     });
+        // }
 
         if (user.isTwoFactorEnabled) {
             return res.json({ success: true, requiresTwoFactor: true, userId: user._id, message: '2FA code required' });
