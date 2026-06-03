@@ -47,7 +47,7 @@ function GigDetail() {
         setError('');
         try {
             await axios.post('http://localhost:5000/api/proposals',
-                { gigId: id, Letter: proposal.coverLetter, bidAmount: parseInt(proposal.bidAmount), estimatedDays: parseInt(proposal.estimatedDays) },
+                { gigId: id, coverLetter: proposal.coverLetter, bidAmount: parseInt(proposal.bidAmount), estimatedDays: parseInt(proposal.estimatedDays) },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setSuccess('Proposal submitted! Redirecting...');
