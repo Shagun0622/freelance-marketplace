@@ -8,7 +8,7 @@ import {
     LogOut, CreditCard, Search, Zap, ChevronRight, Eye, Clock
 } from 'lucide-react';
 
-const API = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api';
+const API = 'http://localhost:5000/api';
 
 function AdminDashboard() {
     const { user, logout, token } = useAuth();

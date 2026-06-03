@@ -17,7 +17,7 @@ function OAuthSuccess() {
             // Fetch user data
             const fetchUser = async () => {
                 try {
-                    const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/me', {
+                    const res = await axios.get('http://localhost:5000/api/auth/me', {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     localStorage.setItem('user', JSON.stringify(res.data.user));

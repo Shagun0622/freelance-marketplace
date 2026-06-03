@@ -31,7 +31,7 @@ function RaiseDispute() {
 
     const fetchPayments = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/payments/my-payments', {
+            const res = await axios.get('http://localhost:5000/api/payments/my-payments', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // Only allow disputes on completed/escrow payments
@@ -56,7 +56,7 @@ function RaiseDispute() {
         setSubmitting(true);
         setError('');
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/disputes', {
+            await axios.post('http://localhost:5000/api/disputes', {
                 gigId: selectedPayment.gigId?._id || selectedPayment.gigId,
                 paymentId: form.paymentId,
                 reason: form.reason,

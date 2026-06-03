@@ -153,7 +153,7 @@ function FreelancerPayment({ token, formatAmount }) {
     useEffect(() => {
         const fetchEarnings = async () => {
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/payments/my-payments', { headers: { Authorization: `Bearer ${token}` } });
+                const res = await axios.get('http://localhost:5000/api/payments/my-payments', { headers: { Authorization: `Bearer ${token}` } });
                 setPayments(res.data.payments || []);
                 setEarned(res.data.totalEarned || 0);
             } catch (e) {}
@@ -235,7 +235,7 @@ function Dashboard() {
         setLoading(true);
         try {
             if (isClient) {
-                const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/gigs/my-gigs', { headers: { Authorization: `Bearer ${token}` } });
+                const { data } = await axios.get('http://localhost:5000/api/gigs/my-gigs', { headers: { Authorization: `Bearer ${token}` } });
                 const gigs = data.gigs || [];
                 setPostedGigs(gigs);
                 const activeGigs = gigs.filter(g => g.status === 'in_progress').length;
@@ -254,7 +254,7 @@ function Dashboard() {
                 }
                 setStats({ activeProjects: activeGigs, proposalsReceived: totalProp, totalSpent: totalBudget, hiredFreelancers: hired, proposalsSent: 0, totalEarned: 0 });
             } else {
-                const { data } = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/proposals/my-proposals', { headers: { Authorization: `Bearer ${token}` } });
+                const { data } = await axios.get('http://localhost:5000/api/proposals/my-proposals', { headers: { Authorization: `Bearer ${token}` } });
                 const proposals = data.proposals || [];
                 setStats({
                     activeProjects: proposals.filter(p => p.status === 'accepted').length,
@@ -286,7 +286,7 @@ function Dashboard() {
 
     const handleProfileUpdate = async () => {
         try {
-            const res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/update-profile', profileForm, { headers: { Authorization: `Bearer ${token}` } });
+            const res = await axios.put('http://localhost:5000/api/auth/update-profile', profileForm, { headers: { Authorization: `Bearer ${token}` } });
             updateUser(res.data.user);
             setShowProfileEdit(false);
             calcProfile();

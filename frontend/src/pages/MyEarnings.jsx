@@ -16,7 +16,7 @@ function MyEarnings() {
 
     const fetchEarnings = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/payments/my-payments', {
+            const res = await axios.get('http://localhost:5000/api/payments/my-payments', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPayments(res.data.payments || []);

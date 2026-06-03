@@ -19,7 +19,7 @@ export const NotificationProvider = ({ children }) => {
         if (!token) return;
         
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications?limit=20', {
+            const res = await axios.get('http://localhost:5000/api/notifications?limit=20', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications(res.data.notifications);
@@ -46,7 +46,7 @@ export const NotificationProvider = ({ children }) => {
 
     const markAllAsRead = async () => {
         try {
-            await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications/read-all', {}, {
+            await axios.put('http://localhost:5000/api/notifications/read-all', {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications(prev => prev.map(n => ({ ...n, read: true })));

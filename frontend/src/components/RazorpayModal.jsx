@@ -29,7 +29,7 @@ function RazorpayModal({ amount, gigId, proposalId, onSuccess, onClose }) {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/razorpay/create-order',
+            const res = await axios.post('http://localhost:5000/api/razorpay/create-order',
                 { gigId, proposalId, amount }, // send USD amount, backend converts
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -43,7 +43,7 @@ function RazorpayModal({ amount, gigId, proposalId, onSuccess, onClose }) {
     const notifyPaymentFailure = async (paymentRecordId) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/razorpay/payment-failed',
+            await axios.post('http://localhost:5000/api/razorpay/payment-failed',
                 { paymentRecordId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

@@ -81,7 +81,7 @@ function PostGig() {
                 max: toUSD(formData.budget.max)
             };
             await axios.post(
-                `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/gigs',
+                'http://localhost:5000/api/gigs',
                 { ...formData, budget: budgetInUSD },
                 { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
             );

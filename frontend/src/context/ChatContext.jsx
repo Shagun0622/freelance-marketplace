@@ -51,7 +51,7 @@ export const ChatProvider = ({ children }) => {
             socketRef.current.disconnect();
         }
 
-        const newSocket = io(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}', {
+        const newSocket = io('http://localhost:5000', {
             auth: { token },
             transports: ['websocket', 'polling'],
             reconnection: true,
@@ -176,7 +176,7 @@ export const ChatProvider = ({ children }) => {
         if (!token) return;
         try {
             const res = await axios.get(
-                `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/chat/conversations',
+                'http://localhost:5000/api/chat/conversations',
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setConversations(res.data.conversations);
@@ -228,7 +228,7 @@ export const ChatProvider = ({ children }) => {
         if (!token) return null;
         try {
             const res = await axios.post(
-                `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/chat/conversation',
+                'http://localhost:5000/api/chat/conversation',
                 { otherUserId, gigId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -291,7 +291,7 @@ export const ChatProvider = ({ children }) => {
         if (!token) return;
         try {
             const res = await axios.get(
-                `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/chat/unread-count',
+                'http://localhost:5000/api/chat/unread-count',
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setUnreadCount(res.data.count);
