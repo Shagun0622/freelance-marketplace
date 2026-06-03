@@ -23,10 +23,22 @@ function GigDetail() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const INR_RATE = 83.5;
+    // Exchange rate: 1 USD = 85 INR
+    const USD_TO_INR_RATE = 85;
+    
+    // Convert INR to USD for backend storage
+    const convertINRtoUSD = (inrAmount) => {
+        return Math.round(parseInt(inrAmount) / USD_TO_INR_RATE);
+    };
+    
+    // Convert USD to INR for display
+    const convertUSDtoINR = (usdAmount) => {
+        return usdAmount * USD_TO_INR_RATE;
+    };
+
     const bidInINR = proposal.bidAmount
         ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })
-            .format(Math.round(proposal.bidAmount * INR_RATE))
+            .format(parseInt(proposal.bidAmount))
         : null;
 
     useEffect(() => { fetchGig(); }, [id]);
@@ -42,11 +54,13 @@ function GigDetail() {
     const handleProposalChange = (e) => {
         const { name, value } = e.target;
         
-        // For bidAmount, validate against max budget
+        // For bidAmount, validate against max budget (in INR)
         if (name === 'bidAmount') {
             const bidValue = parseInt(value);
-            if (gig && bidValue > gig.budget?.max) {
-                setError(`Bid amount cannot exceed ₹${gig.budget?.max}`);
+            const maxBudgetINR = gig?.budget?.max ? convertUSDtoINR(gig.budget.max) : 0;
+            
+            if (bidValue > maxBudgetINR) {
+                setError(`Bid amount cannot exceed ₹${maxBudgetINR.toLocaleString()}`);
             } else {
                 setError('');
             }
@@ -58,13 +72,16 @@ function GigDetail() {
     const handleSubmitProposal = async (e) => {
         e.preventDefault();
         
+        const bidValueINR = parseInt(proposal.bidAmount);
+        const maxBudgetINR = gig?.budget?.max ? convertUSDtoINR(gig.budget.max) : 0;
+        
         // Final validation before submission
-        if (parseInt(proposal.bidAmount) > gig.budget?.max) {
-            setError(`Bid amount cannot exceed ₹${gig.budget?.max}`);
+        if (bidValueINR > maxBudgetINR) {
+            setError(`Bid amount cannot exceed ₹${maxBudgetINR.toLocaleString()}`);
             return;
         }
         
-        if (parseInt(proposal.bidAmount) < 50) {
+        if (bidValueINR < 50) {
             setError('Bid amount must be at least ₹50');
             return;
         }
@@ -72,9 +89,19 @@ function GigDetail() {
         setSubmitting(true);
         setError('');
         
+        // 🔥 CONVERT INR TO USD before sending to backend
+        const bidAmountInUSD = convertINRtoUSD(proposal.bidAmount);
+        
+        console.log(`💰 Converting: ₹${proposal.bidAmount} INR → $${bidAmountInUSD} USD`);
+        
         try {
             await axios.post('http://localhost:5000/api/proposals',
-                { gigId: id, coverLetter: proposal.coverLetter, bidAmount: parseInt(proposal.bidAmount), estimatedDays: parseInt(proposal.estimatedDays) },
+                { 
+                    gigId: id, 
+                    coverLetter: proposal.coverLetter, 
+                    bidAmount: bidAmountInUSD,  // Send USD to backend
+                    estimatedDays: parseInt(proposal.estimatedDays) 
+                },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setSuccess('Proposal submitted! Redirecting...');
@@ -149,6 +176,10 @@ function GigDetail() {
     const inputClass = "w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm text-[#1a2332] placeholder-gray-400 focus:outline-none focus:border-[#0d9f6f] transition-colors shadow-sm";
     const labelClass = "block text-sm font-semibold text-[#1a2332] mb-1.5";
 
+    // Get max budget in INR for display
+    const maxBudgetINR = gig.budget?.max ? convertUSDtoINR(gig.budget.max) : 0;
+    const minBudgetINR = gig.budget?.min ? convertUSDtoINR(gig.budget.min) : 0;
+
     return (
         <div className="min-h-screen bg-gray-100 py-8">
             <div className="max-w-4xl mx-auto px-4 sm:px-6">
@@ -185,7 +216,10 @@ function GigDetail() {
                                 <div className="text-2xl font-bold text-[#0d9f6f]">
                                     {formatAmount(gig.budget?.min)} – {formatAmount(gig.budget?.max)}
                                 </div>
-                                <p className="text-xs text-gray-400 mt-1">Budget Range</p>
+                                <p className="text-xs text-gray-400 mt-1">Budget Range (USD)</p>
+                                <p className="text-xs text-gray-400 mt-0.5">
+                                    ≈ ₹{minBudgetINR.toLocaleString()} – ₹{maxBudgetINR.toLocaleString()}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -268,7 +302,7 @@ function GigDetail() {
                                         className={`${inputClass} resize-none`} required />
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {/* Bid Amount with validation */}
+                                    {/* Bid Amount in INR */}
                                     <div>
                                         <label className={labelClass}>Bid Amount (INR) <span className="text-red-400">*</span></label>
                                         <div className="relative">
@@ -278,21 +312,23 @@ function GigDetail() {
                                                 name="bidAmount"
                                                 value={proposal.bidAmount}
                                                 onChange={handleProposalChange}
-                                                placeholder={`Max: ₹${gig.budget?.max}`}
+                                                placeholder={`Max: ₹${maxBudgetINR.toLocaleString()}`}
                                                 className={`${inputClass} pl-7`}
                                                 required
-                                                max={gig.budget?.max}
+                                                max={maxBudgetINR}
                                             />
                                         </div>
                                         {bidInINR && (
-                                            <p className="text-xs text-[#0d9f6f] font-medium mt-1">≈ {bidInINR}</p>
+                                            <p className="text-xs text-[#0d9f6f] font-medium mt-1">
+                                                ≈ ${convertINRtoUSD(proposal.bidAmount)} USD
+                                            </p>
                                         )}
                                         <p className="text-xs text-gray-400 mt-0.5">
-                                            Budget: {formatAmount(gig.budget?.min)} – {formatAmount(gig.budget?.max)}
+                                            Budget: ₹{minBudgetINR.toLocaleString()} – ₹{maxBudgetINR.toLocaleString()}
                                         </p>
-                                        {proposal.bidAmount && parseInt(proposal.bidAmount) > gig.budget?.max && (
+                                        {proposal.bidAmount && parseInt(proposal.bidAmount) > maxBudgetINR && (
                                             <p className="text-xs text-red-500 mt-1">
-                                                ⚠️ Bid cannot exceed ₹{gig.budget?.max}
+                                                ⚠️ Bid cannot exceed ₹{maxBudgetINR.toLocaleString()}
                                             </p>
                                         )}
                                     </div>
@@ -305,8 +341,11 @@ function GigDetail() {
                                         </div>
                                     </div>
                                 </div>
-                                <button type="submit" disabled={submitting || (proposal.bidAmount && parseInt(proposal.bidAmount) > gig.budget?.max)}
-                                    className="w-full bg-[#0d9f6f] text-white py-3 rounded-xl font-semibold text-sm hover:bg-[#0a8560] transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                                <button 
+                                    type="submit" 
+                                    disabled={submitting || (proposal.bidAmount && parseInt(proposal.bidAmount) > maxBudgetINR)}
+                                    className="w-full bg-[#0d9f6f] text-white py-3 rounded-xl font-semibold text-sm hover:bg-[#0a8560] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+                                >
                                     {submitting ? <><Loader size={15} className="animate-spin" /> Submitting...</> : <><Send size={15} /> Submit Proposal</>}
                                 </button>
                             </form>
