@@ -41,7 +41,7 @@ function Login() {
 
     const fetchUserData = async (token) => {
         try {
-            const res = await axios.get('http://localhost:5000/api/auth/me', {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/me', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             localStorage.setItem('user', JSON.stringify(res.data.user));
@@ -79,7 +79,7 @@ function Login() {
     const handleVerify2FA = async () => {
         setLoading(true);
         try {
-            const res = await axios.post('http://localhost:5000/api/2fa/verify-login', {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/2fa/verify-login', {
                 userId: tempUserId,
                 token: twoFactorCode
             });
@@ -100,7 +100,7 @@ function Login() {
     const handleResendVerification = async () => {
         setResendLoading(true);
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/resend-verification', {
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/resend-verification', {
                 email: email
             });
             setResendMessage(res.data.message);
@@ -112,7 +112,7 @@ function Login() {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = 'http://localhost:5000/api/auth/google';
+        window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/google';
     };
 
     // 2FA Verification Form

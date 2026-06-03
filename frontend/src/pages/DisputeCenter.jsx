@@ -30,7 +30,7 @@ function DisputeCenter() {
     const fetchDisputes = async () => {
         setLoading(true);
         try {
-            const res = await axios.get('http://localhost:5000/api/disputes/my', {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/disputes/my', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDisputes(res.data.disputes || []);

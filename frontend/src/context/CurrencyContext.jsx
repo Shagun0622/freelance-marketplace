@@ -17,7 +17,7 @@ export const CurrencyProvider = ({ children }) => {
     // Fetch all supported currencies
     const fetchCurrencies = useCallback(async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/currency/supported');
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/currency/supported');
             setCurrencies(res.data.currencies || []);
         } catch (error) {
             console.error('Error fetching currencies:', error);
@@ -27,7 +27,7 @@ export const CurrencyProvider = ({ children }) => {
     // Fetch exchange rates
     const fetchRates = useCallback(async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/currency/rates');
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/currency/rates');
             setExchangeRates(res.data.rates || {});
         } catch (error) {
             console.error('Error fetching rates:', error);
@@ -39,7 +39,7 @@ export const CurrencyProvider = ({ children }) => {
         if (!token) return;
         
         try {
-            const res = await axios.get('http://localhost:5000/api/currency/preference', {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/currency/preference', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setCurrency(res.data.currency || 'USD');
@@ -52,7 +52,7 @@ export const CurrencyProvider = ({ children }) => {
     // Update currency preference
     const updateCurrency = async (newCurrency) => {
         try {
-            const res = await axios.put('http://localhost:5000/api/currency/preference', 
+            const res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/currency/preference', 
                 { currency: newCurrency },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

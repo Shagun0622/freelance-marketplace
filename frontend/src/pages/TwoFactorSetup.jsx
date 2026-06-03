@@ -15,7 +15,7 @@ function TwoFactorSetup() {
     }, []);
 
     const check2FAStatus = async () => {
-        const res = await axios.get('http://localhost:5000/api/2fa/status', {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/2fa/status', {
             headers: { Authorization: `Bearer ${token}` }
         });
         setIsEnabled(res.data.enabled);
@@ -23,7 +23,7 @@ function TwoFactorSetup() {
 
     const setup2FA = async () => {
         setLoading(true);
-        const res = await axios.post('http://localhost:5000/api/2fa/setup', {}, {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/2fa/setup', {}, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setSecret(res.data.secret);
@@ -32,7 +32,7 @@ function TwoFactorSetup() {
     };
 
     const enable2FA = async () => {
-        await axios.post('http://localhost:5000/api/2fa/verify-enable', {
+        await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/2fa/verify-enable', {
             token: verificationCode
         }, {
             headers: { Authorization: `Bearer ${token}` }

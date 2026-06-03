@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
     const checkUser = async () => {
         if (token) {
             try {
-                const res = await axios.get('http://localhost:5000/api/auth/me');
+                const res = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/me');
                 setUser(res.data.user);
                 // Also store user in localStorage for persistence
                 localStorage.setItem('user', JSON.stringify(res.data.user));
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (userData) => {
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/register', userData);
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/register', userData);
             const { token: newToken, user: newUser } = res.data;
             localStorage.setItem('token', newToken);
             localStorage.setItem('user', JSON.stringify(newUser));
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+            const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/login', { email, password });
             const { token: newToken, user: newUser } = res.data;
             localStorage.setItem('token', newToken);
             localStorage.setItem('user', JSON.stringify(newUser));
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
     // 🔥 NEW: Update user profile (for Dashboard edit profile)
     const updateUser = async (updatedUserData) => {
         try {
-            const res = await axios.put('http://localhost:5000/api/auth/update-profile', updatedUserData, {
+            const res = await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/update-profile', updatedUserData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const updatedUser = res.data.user;

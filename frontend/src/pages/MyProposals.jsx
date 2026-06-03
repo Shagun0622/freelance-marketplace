@@ -32,7 +32,7 @@ function MyProposals() {
         setLoading(true);
         try {
             const res = await axios.get(
-                'http://localhost:5000/api/proposals/my-proposals',
+                `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/proposals/my-proposals',
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             const fetched = res.data.proposals;

@@ -15,7 +15,7 @@ function MyPayments() {
 
     const fetchPayments = async () => {
         try {
-            const gigsRes = await axios.get('http://localhost:5000/api/gigs/my-gigs', {
+            const gigsRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/gigs/my-gigs', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const gigs = gigsRes.data.gigs || [];
